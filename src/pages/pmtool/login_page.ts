@@ -1,4 +1,6 @@
 import { Locator, Page } from "@playwright/test";
+import { DashboardPage } from "./dashboard_page.ts";
+import { LostPasswordPage } from "./lost_password_page.ts";
 
 export class LoginPage {
   readonly page: Page;
@@ -18,27 +20,34 @@ export class LoginPage {
 
   async open() {
     await this.page.goto(this.url);
+    return this; //po otevreni zustavam na login page - davam return this, abych mohl volat dalsi metody z teto tridy
   }
 
   async fillUsername(username: string) {
     await this.usernameInput.fill(username);
+    return this;
   }
 
   async fillPassword(password: string) {
     await this.passwordInput.fill(password);
+    return this;
   }
 
   async clickLogin() {
     await this.loginButton.click();
+    return new DashboardPage(this.page); //po kliknuti na login button se dostanu na dashboard page, takze vracim novy objekt dashboard page
   }
 
   async clickPasswordForgotten() {
     await this.lostPasswordButton.click();
+    return new LostPasswordPage(this.page); //po kliknuti na lost password button se dostanu na lost password page, takze vracim novy objekt lost password page
   }
 
-  async login(username: string, password: string) {
+  //Explicitni typ navratove hodnoty je Promise<DashboardPage>, protoze tato metoda vraci instanci DashboardPage po uspesnem prihlaseni
+  async login(username: string, password: string): Promise<DashboardPage> {
     await this.fillUsername(username);
     await this.fillPassword(password);
     await this.clickLogin();
+    return new DashboardPage(this.page); //po uspesnem prihlaseni se dostanu na dashboard page, takze vracim novy objekt dashboard page
   }
 }
